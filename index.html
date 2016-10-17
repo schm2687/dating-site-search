@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">	
+		<script src="d3.min.js"></script>	
+		<link href="https://fonts.googleapis.com/css?family=Muli:300,300i,400,400i" rel="stylesheet">
+		<!-- Load jQuery -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+ 
+ 
+
+		<title>D3 Line Graph</title>
+
+		    <!-- javascript that will initiate jQuery and the LocalScroll plugin -->
+		    <script type="text/javascript">
+   				 $(function() {
+  $('a[href*="#"]:not([href="#"])').click(function() {
+    if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+      var target = $(this.hash);
+      target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+      if (target.length) {
+        $('html, body').animate({
+          scrollTop: target.offset().top
+        }, 1000);
+        return false;
+      }
+    }
+  });
+});
+</script>
+	</head>
+
+	<style>
+		#chart {
+			width: 1200px;
+			height: 350px;
+			margin: 40px 0px 0px 0px;
+			z-index: -1;
+			position: fixed;
+			
+			
+		}
+
+		#toptext {
+			width: 600px;
+			height: 450px;
+			background-color: #df5137;
+			padding: 10px 90px 10px 70px;
+			margin: 0px 0px 0px 200px;
+			display: inline-block;
+			position: relative;
+			z-index: 1;
+
+
+		}
+
+		#transparentContainer {
+			width: 450px;
+			height: 450px;
+			padding: 10px 0px 10px 0px;
+			margin: 0px 0px 0px 0px;
+			opacity: 0.75;
+			position: absolute;
+			background-color: white;
+			display: inline-block;
+		}
+
+		#scrollInstructions {
+			width: 200px;
+			height: 75px;
+			border-radius: 10px;
+			top: 500px;
+			left: 475px;
+			position: absolute;
+			background-color: grey;
+
+		}
+
+		#scrollInstructions:hover {
+			width: 200px;
+			height: 75px;
+			border-radius: 10px;
+			top: 500px;
+			left: 475px;
+			position: absolute;
+			background-color: grey;
+			opacity:0.75;
+			-webkit-transition: 0.5s;
+
+		}
+
+		.title-h1 {
+			font-family: 'Muli', sans-serif;
+			color: white;
+			font-weight: 300;
+			font-size: 3em;
+			kerning: 2px;
+		}
+
+		.main-paragraph {
+			font-family: 'Muli', sans-serif;
+			color: white;
+			font-weight: 300;
+			font-size: 1em;
+			line-height: 1.5em;
+		}
+
+		.scrollWords {
+			font-family: 'Muli', sans-serif;
+			color: white;
+			text-align: center;
+			font-weight: 400;
+			font-size: 1.5em;
+			font-variant: small-caps;
+		}
+
+		#scrollStop { 
+			position: absolute;
+			top: 1150px;
+
+
+		}
+ 
+		path { 
+  			stroke-width: 2;
+  			fill: none;
+		}
+ 
+		.axis path,
+		.axis line {
+			fill: none;
+			stroke: grey;
+			stroke-width: 1;
+		}
+
+		.axis text {
+			font: 10px Helvetica;
+			fill: gray;
+		}
+
+		#eharmonyHeart { 
+			width: 30px;
+			height: 30px;
+			background: url(images/eharmonyHeart.png);
+			background-size: 100%;
+			position: absolute;
+			top: 1150px;
+			left: 400px;
+			padding: 0px, 0px, 200px, 0px;
+			display: inline-block;
+			-webkit-transition: 0.15s;
+		}
+
+		#matchHeart { 
+			width: 30px;
+			height: 30px;
+			background: url(images/matchHeart.png);
+			background-size: 100%;
+			position: absolute;
+			top: 1150px;
+			left: 600px;
+			padding: 0px, 0px, 200px, 0px;
+			display: inline-block;
+			-webkit-transition: 0.15s;
+		}
+
+		#tinderHeart { 
+			width: 30px;
+			height: 30px;
+			background: url(images/tinderHeart.png);
+			background-size: 100%;
+			position: absolute;
+			top: 1150px;
+			left: 800px;
+			padding: 0px, 0px, 200px, 0px;
+			display: inline-block;
+			-webkit-transition: 0.15s;
+		}
+
+		#eharmonyTitle { 
+			width: 60px;
+			position: absolute;
+			top: 1275px;
+			left: 315px;
+			display: inline-block;
+		}
+
+		#matchTitle { 
+			position: absolute;
+			top: 1275px;
+			left: 515px;
+			display: inline-block;
+
+		}
+
+		#tinderTitle { 
+			position: absolute;
+			top: 1275px;
+			left: 715px;
+			display: inline-block;
+			
+		}
+
+		#space { 
+			width: 1200px;
+			height: 150px;
+			position: absolute;
+			top: 1200px;
+
+		}
+		
+
+	</style>
+
+	<body>
+
+	<div id="chart"></div>
+
+	<div id="transparentContainer">
+	</div>
+	
+	<div id="toptext">
+		<h1 class="title-h1">Tinder: a new trend in online dating?</h1>
+		<p class="main-paragraph">From 2011 to 2014, Googlers searched for dating websites — <i>specifically eHarmony and match.com</i> — according to a predictable pattern. The number of topic searches rise in late December/early January and early February<br>each year, correllating with New Years and Valentine’s Day. However, with the rise in popularity of Tinder, not only do the searches for eHarmony and match.com decrease, but the pattern becomes less pronounced. We still <br>see spikes in popularity around New Years and Valentine’s Day, but we also see other peaks throughout the year. Is this change in the search trend indicative of a new way we use online dating services?
+		</p>
+
+
+	</div>
+
+	<a href="#scrollStop"><div id="scrollInstructions">
+			<p class="scrollWords">view the data</p>
+		</div></a>
+	
+	<div id="transparentContainer">
+	</div>
+
+
+	<div id="scrollStop"></div>	
+
+	<div id="dateAnnotation">
+	</div>
+
+
+	<div id="eharmonyHeart">
+	</div>
+
+	<div id="matchHeart">
+	</div>
+
+	<div id="tinderHeart">
+	</div>
+
+	<div id="eharmonyTitle">
+	<img src="images/eharmonyTitle.png" alt="eHarmony" width="200">
+	</div>
+
+	<div id="matchTitle">
+	<img src="images/matchTitle.png" alt="Match.com" width="200">
+	</div>
+
+	<div id="tinderTitle">
+	<img src="images/tinderTitle.png" alt="Tinder" width="200">
+	</div>
+
+	<div id="space">
+	</div>
+
+
+	</body>
+
+	<script type="text/javascript">
+
+	// 1 : Define the dataset
+	d3.csv("data/datingsites.csv", function(error, data) {
+
+	// 2 : Parse the dataset
+	var parseDate = d3.time.format("%Y-%m-%d").parse;
+	var bisectDate = d3.bisector(function(d) { return d.date; }).left; // need to bisect date first: to convert our date to an index(sequential number). This is needed when we want something to follow our mouse cursor: the index number will basically serve as our x and y coordinates for the objects that we want to move around. More on line 166.
+data.forEach(function(d) {
+		d.date = parseDate(d.date);
+		d['tinder'] = +d['tinder'];
+		d['match'] = +d['match'];
+		d['eharmony'] = +d['eharmony'];
+});
+
+
+	// 3 : Define the chart's scale
+var padding = {top: 30, right: 20, bottom: 30, left: 50};
+var w = 1200 - padding.left - padding.right;
+var h = 270 - padding.top - padding.bottom;
+
+var xScale = d3.time.scale()
+		.domain(d3.extent(data, function(d) { return d.date; }))
+		.range([0, w]);
+
+var yScale = d3.scale.linear()
+		.domain([0, d3.max(data, function(d) { return d['tinder']; })])
+		.range([h, 0]);
+
+
+	// 4 : Establish the drawing area
+var svg = d3.select("#chart")
+	         .append("svg")
+		      .attr("width", w + padding.left + padding.right)
+		      .attr("height", h + padding.top + padding.bottom)
+	         .append("g")
+	.attr("transform", "translate(" + padding.left + "," + padding.top + ")");
+
+
+	// 5 : Draw svg elements
+var tinderline = d3.svg.line()
+	               .x(function(d) { return xScale(d.date); })
+	               .y(function(d) { return yScale(+d['tinder']); });
+
+var matchline = d3.svg.line()
+	               .x(function(d) { return xScale(d.date); })
+	               .y(function(d) { return yScale(+d['match']); });
+
+var eharmonyline = d3.svg.line()
+	               .x(function(d) { return xScale(d.date); })
+	               .y(function(d) { return yScale(+d['eharmony']); });
+
+svg.append("path")	
+		.attr("stroke", "#df5137")
+		.attr("d", tinderline(data));
+
+svg.append("path")	
+		.attr("stroke", "#1a74bc")
+		.attr("d", matchline(data));
+
+svg.append("path")	
+		.attr("stroke", "#3a8898")
+		.attr("d", eharmonyline(data));
+
+	// 6 : Set axes
+var xAxis = d3.svg.axis()
+              .scale(xScale)
+	           .orient("bottom")
+              .ticks(5);
+
+svg.append("g").call(xAxis)	
+		.attr("class", "x axis")
+		.attr("transform", "translate(0," + h + ")");
+
+		var yAxis = d3.svg.axis()
+              .scale(yScale)
+	           .orient("left")
+              .ticks(5);
+
+svg.append("g").call(yAxis)	
+		.attr("class", "y axis");
+
+//interactive d3 stuff
+
+	var focus = svg.append("g")
+    	.style("display", "none");
+
+	svg.append("rect") // we need to define an area where d3/javascript will actively measure the position of our mouse cursor
+        .attr("width", w)
+        .attr("height", h)
+        .style("fill", "none")
+        .style("pointer-events", "all")
+        .on("mouseover", function() { focus.style("display", null); }) // ensures that the drawing area isn't seen
+        .on("mouseout", function() { focus.style("display", "none"); }) // ditto
+        .on("mousemove", mousemove); // activates function below (line 166)
+
+	focus.append("line") // vertical line that follows our mouse cursor
+        .attr("class", "y")
+        .style("fill", "none")
+        .style("stroke", "gray")
+        .attr("x1", "0")
+        .attr("y1", -h)
+        .attr("x2", "0")
+        .attr("y2", "0");
+
+
+	function mousemove() {
+
+        var k = bisectDate(data, xScale.invert(d3.mouse(this)[0]), 1),
+            d = xScale.invert(d3.mouse(this)[0]) - data[k - 1].date > data[k].date - xScale.invert(d3.mouse(this)[0]) ? data[k] : data[k - 1]; // this ugly mess basically makes sure that the date values of our dataset gets converted to a number that we can use to scale our image and move our newly created line and text.
+
+          focus.select("line.y") // getting the line to actually follow the cursor
+              .attr("transform", "translate(" + xScale(d.date) + "," + h + ")");
+
+          focus.select("text.y") // same deal but for the text
+               .attr("transform", "translate(" + xScale(d.date) + "," + yScale(d.tinder) + ")")
+               .attr("transform", "translate(" + xScale(d.date) + "," + yScale(d.match) + ")")
+			   .attr("transform", "translate(" + xScale(d.date) + "," + yScale(d.eharmony) + ")")
+
+          document.getElementById("eharmonyHeart") // getting the image to scale according to the data. the division by 5 is needed or else our image will get ridiculously large
+          		.setAttribute("style", "transform: scale(" + d.eharmony / 15 + "," + d.eharmony / 15 + ")");
+          document.getElementById("matchHeart") // getting the image to scale according to the data. the division by 5 is needed or else our image will get ridiculously large
+          		.setAttribute("style", "transform: scale(" + d.match / 15 + "," + d.match / 15 + ")");
+          document.getElementById("tinderHeart") // getting the image to scale according to the data. the division by 5 is needed or else our image will get ridiculously large
+          		.setAttribute("style", "transform: scale(" + d.tinder / 15 + "," + d.tinder / 15 + ")");
+	}   
+
+}); // important to be at very end of stuff
+	</script>
+
+</html>
