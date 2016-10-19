@@ -41,6 +41,16 @@
 			
 		}
 
+		#annotations {
+			width: 1200px;
+			height: 350px;
+			margin: 30px 0px 0px 30px;
+			z-index: -2;
+			position: fixed;
+			
+			
+		}
+
 		#toptext {
 			width: 600px;
 			height: 450px;
@@ -208,13 +218,20 @@
 			top: 1200px;
 
 		}
+
+
 		
 
 	</style>
 
 	<body>
+<div id="annotations">
+<img src="images/annotations.png" alt="annotations. this is not helpful alt text really" width="1150">
+</div>
 
-	<div id="chart"></div>
+	<div id="chart">
+		
+	</div>
 
 	<div id="transparentContainer">
 	</div>
@@ -281,6 +298,7 @@ data.forEach(function(d) {
 		d['tinder'] = +d['tinder'];
 		d['match'] = +d['match'];
 		d['eharmony'] = +d['eharmony'];
+		d['select'] = +d['v-select'];
 });
 
 
@@ -300,11 +318,11 @@ var yScale = d3.scale.linear()
 
 	// 4 : Establish the drawing area
 var svg = d3.select("#chart")
-	         .append("svg")
-		      .attr("width", w + padding.left + padding.right)
-		      .attr("height", h + padding.top + padding.bottom)
-	         .append("g")
-	.attr("transform", "translate(" + padding.left + "," + padding.top + ")");
+	    .append("svg")
+		.attr("width", w + padding.left + padding.right)
+		.attr("height", h + padding.top + padding.bottom)
+	    .append("g")
+		.attr("transform", "translate(" + padding.left + "," + padding.top + ")");
 
 
 	// 5 : Draw svg elements
@@ -320,6 +338,7 @@ var eharmonyline = d3.svg.line()
 	               .x(function(d) { return xScale(d.date); })
 	               .y(function(d) { return yScale(+d['eharmony']); });
 
+
 svg.append("path")	
 		.attr("stroke", "#df5137")
 		.attr("d", tinderline(data));
@@ -331,6 +350,9 @@ svg.append("path")
 svg.append("path")	
 		.attr("stroke", "#3a8898")
 		.attr("d", eharmonyline(data));
+
+
+
 
 	// 6 : Set axes
 var xAxis = d3.svg.axis()
@@ -394,6 +416,10 @@ svg.append("g").call(yAxis)
           document.getElementById("tinderHeart") // getting the image to scale according to the data. the division by 5 is needed or else our image will get ridiculously large
           		.setAttribute("style", "transform: scale(" + d.tinder / 15 + "," + d.tinder / 15 + ")");
 	}   
+
+
+
+	
 
 }); // important to be at very end of stuff
 	</script>
